@@ -146,7 +146,7 @@ public class Board extends AbstractBoard<Elements> {
             Point next = direction.change(head);
 
             if (!isAt(next, Elements.BREAK) && !isAt(next, Elements.BAD_APPLE) && !getSnake().contains(next)) {
-                this.path.put(next, direction);
+                this.path.put(head, direction);
 
                 return;
             }
