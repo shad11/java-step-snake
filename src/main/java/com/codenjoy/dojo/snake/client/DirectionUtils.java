@@ -53,52 +53,15 @@ public class DirectionUtils {
         return null;
     }
 
-    public static List<String> findPath(Board board, Point start, Point goal, LinkedList<Point> snake, Set<Point> barriers) {
-        Queue<Point> queue = new LinkedList<>();
-        List<String> directions = new ArrayList<>();
-        Set<Point> visited = new HashSet<>(barriers);
-
-        queue.add(start);
-
-        while (!queue.isEmpty()) {
-            Point current = queue.poll();
-
-            if (current.equals(goal)) {
-                return directions;
-            }
-
-            Direction nextDirection = getNextDirection(current, goal, visited);
-
-//            Point tail = snake.removeLast();
-//            visited.remove(tail);
-
-            if (nextDirection == null) {
-//                return new ArrayList<>(Arrays.asList(Optional.ofNullable(findSaveDirection(current, barriers)).orElse(Direction.STOP).toString()));
-                // TODO: IF STOP eat read apple
-                Direction saveDirection = findSaveDirection(board, start, barriers);
-
-                return new ArrayList<>(Collections.singletonList(Optional.ofNullable(saveDirection).orElse(Direction.STOP).toString()));
-            }
-
-            Point next = nextDirection.change(current);
-
-            queue.add(next);
-            visited.add(next);
-//            snake.addFirst(next);
-
-            directions.add(nextDirection.toString());
-        }
-
-        return null;
-    }
-
     public static Direction findSaveDirection(Board board, Point current, Set<Point> visited) {
         List<Direction> directions = new ArrayList<>(Direction.getValues());
 
         for (Direction direction : directions) {
             Point next = direction.change(current);
+//            System.out.println("Next: " + next);
+//            System.out.println("None count: " + board.countNear(next, Elements.NONE));
 
-            if (!visited.contains(next) && board.countNear(next, Elements.NONE) > 2) {
+            if (!visited.contains(next) && board.countNear(next, Elements.NONE) > 3) {
                 return direction;
             }
         }
@@ -154,25 +117,6 @@ public class DirectionUtils {
         System.out.println("Visited points: " + visited);
 
         return nextPoints.isEmpty() ? null : nextPoints.keySet().iterator().next();
-//        Direction nearestDirection = getDirection(current, goal);
-//        Point next = nearestDirection.change(current);
-//
-//        if (!board.isAt(next, Elements.BREAK) && !board.isAt(next, Elements.BAD_APPLE) && !visited.contains(next)) {
-//            return nearestDirection;
-//        }
-//
-//        List<Direction> directions = new ArrayList<>(Direction.getValues());
-//        directions.remove(nearestDirection);
-//
-//        for (Direction direction : directions) {
-//            next = direction.change(current);
-//
-//            if (!board.isAt(next, Elements.BREAK) && !board.isAt(next, Elements.BAD_APPLE) && !visited.contains(next)) {
-//                return direction;
-//            }
-//        }
-//
-//        return null;
     }
 
     private static int manhattanDistance(Point a, Point b) {

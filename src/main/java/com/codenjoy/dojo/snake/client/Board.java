@@ -31,7 +31,6 @@ import com.codenjoy.dojo.snake.model.Elements;
 import java.util.*;
 
 public class Board extends AbstractBoard<Elements> {
-//    public List<String> moves = new ArrayList<>();
     public Map<Point, Direction> path = new HashMap<>();
 
     @Override
@@ -136,11 +135,9 @@ public class Board extends AbstractBoard<Elements> {
         Point apple = getApples().get(0);
         Point head = getHead();
 
-//        this.moves = new ArrayList<>();
         this.path = new HashMap<>();
 
         if (apple == null) {
-//            this.moves.add(Direction.STOP.toString());
             return;
         }
 
@@ -149,128 +146,17 @@ public class Board extends AbstractBoard<Elements> {
             Point next = direction.change(head);
 
             if (!isAt(next, Elements.BREAK) && !isAt(next, Elements.BAD_APPLE) && !getSnake().contains(next)) {
-//                this.moves.add(direction.toString());
                 this.path.put(next, direction);
 
                 return;
             }
         }
 
-//        LinkedList<Point> snake = new LinkedList<>(getSnake());
         Set<Point> visited = new HashSet<>(getSnake());
         visited.addAll(getBarriers());
 
-//        this.moves = DirectionUtils.findPath(this, head, apple, snake, visited);
         this.path = DirectionUtils.findPath(this, head, apple, visited);
 
-//        System.out.println("Moves:" + this.moves);
         System.out.println("Path:" + this.path);
     }
-
-//    private List<String> bfs(Point start, Point goal) {
-//        Queue<Point> queue = new LinkedList<>();
-////        List<String> directions = new ArrayList<>();
-//        Map<Point, String> directions = new LinkedHashMap<>();
-//        Map<Point, Point> predecessors = new HashMap<>();
-//        Map<Point, Point> failedPoints = new HashMap<>(); // To avoid revisiting dead-ends
-//        LinkedList<Point> snake = new LinkedList<>(getSnake());
-//        Set<Point> visited = new HashSet<>(getSnake());
-//
-//        queue.add(start);
-//        visited.add(start);
-//
-//        while (!queue.isEmpty()) {
-//            Point current = queue.poll();
-//
-//            if (current.equals(goal)) {
-//                return new ArrayList<>(directions.values());
-//            }
-//
-//            Set<Point> failedNextPoints = new HashSet<>(visited);
-//
-//            if (!failedPoints.isEmpty()) {
-//                failedPoints.forEach((key, value) -> {
-//                    if (value.equals(current)) {
-//                        failedNextPoints.add(key);
-//                    }
-//                });
-//            }
-//
-////            Direction nextDirection = getNextDirection(current, goal, visited);
-//            Direction nextDirection = getNextDirection(current, goal, failedNextPoints);
-//
-//            if (nextDirection == null) { // TODO: Need to handle this case
-//                System.out.println("No direction found");
-//
-//                Point currentPoint = current;
-//                Point rollbackPoint = predecessors.get(currentPoint);
-//
-//                System.out.println("Current point: " + currentPoint);
-//                System.out.println("Goal point: " + goal);
-//                System.out.println("Visited points: " + visited);
-//                System.out.println("Predecessors: " + predecessors);
-//                System.out.println("Rollback point: " + rollbackPoint);
-//                System.out.println("Directions: " + directions.values());
-//
-//                String currentValue = directions.remove(currentPoint);
-//                failedPoints.put(currentPoint, rollbackPoint);
-//
-//                while (true) {
-//                    boolean isValid = false;
-//
-//                    for (Direction direction : Direction.getValues()) {
-//                        Point next = direction.change(rollbackPoint);
-//
-//                        if (isAt(next, Elements.BREAK) || isAt(next, Elements.BAD_APPLE)
-//                                || getSnake().contains(next)
-//                                || failedPoints.get(next) == rollbackPoint
-//                        ) {
-//                            continue;
-//                        }
-//
-//                        isValid = true;
-//                        break;
-//                    }
-//
-//                    if (isValid) {
-//                        System.out.println("Directions after rollback: " + directions.values());
-//                        System.out.println("Failed points: " + failedPoints);
-//                        return new ArrayList<>(directions.values());
-//                    }
-//
-//                    currentValue = directions.remove(rollbackPoint);
-//
-//                    if (directions.isEmpty()) {
-//                        break;
-//                    }
-//
-//                    currentPoint = rollbackPoint;
-//                    rollbackPoint = predecessors.get(rollbackPoint);
-//                }
-//
-//                System.out.println("Directions after rollback: " + directions.values());
-//
-//                if (directions.isEmpty()) { // Restart BFS from the rollback point
-//                    rollbackPoint = start;
-//                }
-//
-//                queue.add(rollbackPoint);
-//                continue;
-//            }
-//
-//            Point next = nextDirection.change(current);
-//
-//            queue.add(next);
-//            visited.add(next);
-//            snake.addFirst(next);
-//            predecessors.put(next, current);
-//            directions.put(next, nextDirection.toString());
-//
-//            Point tail = snake.removeLast();
-//
-//            visited.remove(tail);
-//        }
-//
-//        return null;
-//    }
 }
