@@ -2,6 +2,7 @@ package com.codenjoy.dojo.snake.client;
 
 import com.codenjoy.dojo.services.Direction;
 import com.codenjoy.dojo.services.Point;
+import com.codenjoy.dojo.snake.model.Elements;
 
 import java.util.*;
 
@@ -18,7 +19,41 @@ public class DirectionUtils {
         }
     }
 
-    public static List<String> findPath(Point start, Point goal, LinkedList<Point> snake, Set<Point> barriers) {
+    public static Map<Point, Direction> findPath(Board board, Point start, Point goal, Set<Point> barriers) {
+        Queue<Point> queue = new LinkedList<>();
+        Map<Point, Direction> path = new HashMap<>();
+        Set<Point> visited = new HashSet<>(barriers);
+
+        queue.add(start);
+
+        while (!queue.isEmpty()) {
+            Point current = queue.poll();
+
+            if (current.equals(goal)) {
+                return path;
+            }
+
+            Direction nextDirection = getNextDirection(current, goal, visited);
+
+            if (nextDirection == null) {
+                // TODO: IF STOP eat read apple
+                Direction saveDirection = findSaveDirection(board, start, barriers);
+
+                return new HashMap<>(Collections.singletonMap(start, Optional.ofNullable(saveDirection).orElse(Direction.STOP)));
+            }
+
+            Point next = nextDirection.change(current);
+
+            queue.add(next);
+            visited.add(next);
+
+            path.put(current, nextDirection);
+        }
+
+        return null;
+    }
+
+    public static List<String> findPath(Board board, Point start, Point goal, LinkedList<Point> snake, Set<Point> barriers) {
         Queue<Point> queue = new LinkedList<>();
         List<String> directions = new ArrayList<>();
         Set<Point> visited = new HashSet<>(barriers);
@@ -40,7 +75,9 @@ public class DirectionUtils {
             if (nextDirection == null) {
 //                return new ArrayList<>(Arrays.asList(Optional.ofNullable(findSaveDirection(current, barriers)).orElse(Direction.STOP).toString()));
                 // TODO: IF STOP eat read apple
-                return new ArrayList<>(Collections.singletonList(Optional.ofNullable(findSaveDirection(start, barriers)).orElse(Direction.STOP).toString()));
+                Direction saveDirection = findSaveDirection(board, start, barriers);
+
+                return new ArrayList<>(Collections.singletonList(Optional.ofNullable(saveDirection).orElse(Direction.STOP).toString()));
             }
 
             Point next = nextDirection.change(current);
@@ -55,13 +92,13 @@ public class DirectionUtils {
         return null;
     }
 
-    public static Direction findSaveDirection(Point current, Set<Point> visited) {
+    public static Direction findSaveDirection(Board board, Point current, Set<Point> visited) {
         List<Direction> directions = new ArrayList<>(Direction.getValues());
 
         for (Direction direction : directions) {
             Point next = direction.change(current);
 
-            if (!visited.contains(next)) {
+            if (!visited.contains(next) && board.countNear(next, Elements.NONE) > 2) {
                 return direction;
             }
         }

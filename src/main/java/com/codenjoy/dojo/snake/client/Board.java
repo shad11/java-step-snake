@@ -31,7 +31,8 @@ import com.codenjoy.dojo.snake.model.Elements;
 import java.util.*;
 
 public class Board extends AbstractBoard<Elements> {
-    public List<String> moves = new ArrayList<>();
+//    public List<String> moves = new ArrayList<>();
+    public Map<Point, Direction> path = new HashMap<>();
 
     @Override
     public Elements valueOf(char ch) {
@@ -135,11 +136,11 @@ public class Board extends AbstractBoard<Elements> {
         Point apple = getApples().get(0);
         Point head = getHead();
 
-        this.moves = new ArrayList<>();
+//        this.moves = new ArrayList<>();
+        this.path = new HashMap<>();
 
         if (apple == null) {
-            this.moves.add(Direction.STOP.toString());
-
+//            this.moves.add(Direction.STOP.toString());
             return;
         }
 
@@ -148,19 +149,22 @@ public class Board extends AbstractBoard<Elements> {
             Point next = direction.change(head);
 
             if (!isAt(next, Elements.BREAK) && !isAt(next, Elements.BAD_APPLE) && !getSnake().contains(next)) {
-                this.moves.add(direction.toString());
+//                this.moves.add(direction.toString());
+                this.path.put(next, direction);
 
                 return;
             }
         }
 
-        LinkedList<Point> snake = new LinkedList<>(getSnake());
-        Set<Point> visited = new HashSet<>(snake);
+//        LinkedList<Point> snake = new LinkedList<>(getSnake());
+        Set<Point> visited = new HashSet<>(getSnake());
         visited.addAll(getBarriers());
 
-        this.moves = DirectionUtils.findPath(head, apple, snake, visited);
+//        this.moves = DirectionUtils.findPath(this, head, apple, snake, visited);
+        this.path = DirectionUtils.findPath(this, head, apple, visited);
 
-        System.out.println("Moves:" + this.moves);
+//        System.out.println("Moves:" + this.moves);
+        System.out.println("Path:" + this.path);
     }
 
 //    private List<String> bfs(Point start, Point goal) {

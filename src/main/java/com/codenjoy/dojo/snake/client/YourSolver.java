@@ -46,14 +46,18 @@ public class YourSolver implements Solver<Board> {
         this.board = board;
 
         if (board.getHead() == null) {
-            return Direction.ACT.toString();
+            return this.get(board);
         }
 
-        if (board.moves.isEmpty()) {
+        if (board.path.isEmpty()) {
             board.move();
+
+            return this.get(board);
         }
 
-        return board.moves.remove(0);
+        Direction direction = board.path.remove(board.getHead());
+
+        return direction.toString();
     }
 
     public static void main(String[] args) {
