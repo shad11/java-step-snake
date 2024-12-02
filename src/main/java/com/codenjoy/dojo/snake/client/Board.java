@@ -132,20 +132,72 @@ public class Board extends AbstractBoard<Elements> {
         return get(Elements.BREAK);
     }
 
+    public Direction getNextMove() {
+        Point head = getHead();
+        List<Point> snake = getSnake();
+
+        int sizeMax = 42;// (int) Math.pow(this.size() - 2, 2) / 4;
+
+        Elements goalStone =
+                snake.size() >= sizeMax
+                        ? Elements.BAD_APPLE
+                        : Elements.GOOD_APPLE;
+        Elements badStone = snake.size() >= sizeMax
+                ? Elements.GOOD_APPLE
+                : Elements.BAD_APPLE;
+        Point goal = snake.size() >= sizeMax ? getStones().get(0) : getApples().get(0);
+
+        this.path = new HashMap<>();
+
+        if (goal == null) {
+            return null;
+        }
+
+        // TODO: 30 should be a constant
+        if (isNear(head, goalStone) || (snake.size() >= 30 && isNear(head, badStone))) {
+            Direction direction = DirectionUtils.getDirection(head, goal);
+            Point next = direction.change(head);
+
+            if (!isAt(next, Elements.BREAK) && !isAt(next, badStone) && !getSnake().contains(next)) {
+                this.path.put(head, direction);
+
+                return direction;
+            }
+        }
+
+        Set<Point> visited = new HashSet<>(snake);
+        visited.addAll(getWalls());
+        visited.addAll(get(badStone));
+
+        Map<Point, Direction> newPath = DirectionUtils.findPath(head, goal, visited);
+
+        if (newPath != null) {
+            return newPath.get(head);
+        } else {
+            Direction direction = DirectionUtils.findSaveDirection(this, head, visited);
+
+            if (direction != null && isNear(head, badStone)) {
+                direction = DirectionUtils.getDirection(head, get(badStone).get(0));
+            }
+
+            return direction;
+        }
+    }
+
     public void move() {
         Point head = getHead();
         List<Point> snake = getSnake();
-        int sizeMax = (int) Math.pow(this.size() - 2, 2) / 4;
-        boolean isAppleInCorner = countNear(getApples().get(0), Elements.BREAK) == 2;
+
+        int sizeMax = 42;// (int) Math.pow(this.size() - 2, 2) / 4;
 
         Elements goalStone =
-                (snake.size() >= sizeMax || (snake.size() >= (this.size() - 2) * 2 && isAppleInCorner))
+                snake.size() >= sizeMax
                         ? Elements.BAD_APPLE
-                        : Elements.GOOD_APPLE ;
+                        : Elements.GOOD_APPLE;
         Elements badStone = snake.size() >= sizeMax
-                ? Elements.BAD_APPLE
-                : Elements.GOOD_APPLE;
-        Point goal = get(goalStone).get(0);
+                ? Elements.GOOD_APPLE
+                : Elements.BAD_APPLE;
+        Point goal = snake.size() >= sizeMax ? getStones().get(0) : getApples().get(0);
 
         this.path = new HashMap<>();
 
@@ -169,6 +221,18 @@ public class Board extends AbstractBoard<Elements> {
         visited.addAll(getWalls());
         visited.addAll(get(badStone));
 
-        this.path = DirectionUtils.findPath(this, head, goal, visited);
+        Map<Point, Direction> newPath = DirectionUtils.findPath(head, goal, visited);
+
+        if (newPath != null) {
+            this.path = newPath;
+        } else {
+            Direction direction = DirectionUtils.findSaveDirection(this, head, visited);
+
+            if (direction != null) {
+                this.path.put(head, direction);
+            } else {
+                this.path.put(head, Direction.UP);
+            }
+        }
     }
 }

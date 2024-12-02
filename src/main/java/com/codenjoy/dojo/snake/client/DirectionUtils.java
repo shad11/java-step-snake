@@ -7,8 +7,6 @@ import com.codenjoy.dojo.snake.model.Elements;
 import java.util.*;
 
 public class DirectionUtils {
-    public static int PATH_LENGTH = 6;
-
     public static Direction getDirection(Point from, Point to) {
         if (to.getY() == from.getY() && to.getX() > from.getX()) {
             return Direction.RIGHT;
@@ -21,15 +19,14 @@ public class DirectionUtils {
         }
     }
 
-    public static Map<Point, Direction> findPath(Board board, Point start, Point goal, Set<Point> barriers) {
+    public static Map<Point, Direction> findPath(Point start, Point goal, Set<Point> barriers) {
         Queue<Point> queue = new LinkedList<>();
         Map<Point, Direction> path = new LinkedHashMap<>();
         Set<Point> visited = new HashSet<>(barriers);
-        int pathLength = 0;
 
         queue.add(start);
 
-        while (!queue.isEmpty() || pathLength <= PATH_LENGTH) {
+        while (!queue.isEmpty()) {
             Point current = queue.poll();
 
             if (current.equals(goal)) {
@@ -38,26 +35,20 @@ public class DirectionUtils {
 
             Direction nextDirection = getNextDirection(current, goal, visited);
 
-            if (nextDirection == null) {
-                // TODO: IF STOP eat read apple
-                Direction saveDirection = findSaveDirection(board, start, goal, barriers);
+            if (nextDirection != null) {
+                Point next = nextDirection.change(current);
 
-                return new HashMap<>(Collections.singletonMap(start, Optional.ofNullable(saveDirection).orElse(Direction.STOP)));
+                queue.add(next);
+                visited.add(next);
+
+                path.put(current, nextDirection);
             }
-
-            Point next = nextDirection.change(current);
-
-            queue.add(next);
-            visited.add(next);
-
-            path.put(current, nextDirection);
-            pathLength++;
         }
 
         return null;
     }
 
-    public static Direction findSaveDirection(Board board, Point current, Point goal, Set<Point> visited) {
+    public static Direction findSaveDirection(Board board, Point current, Set<Point> visited) {
         List<Direction> directions = new ArrayList<>(Direction.getValues());
         SortedMap<Integer, Direction> directionsNear = new TreeMap<>();
 

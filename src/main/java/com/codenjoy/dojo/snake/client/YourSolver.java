@@ -55,16 +55,13 @@ public class YourSolver implements Solver<Board> {
             return this.get(board);
         }
 
-        Direction direction = board.path.remove(board.getHead());
+        Direction direction = board.getNextMove();
 
-        if (direction == null) {
-            board.path.clear();
-            board.move();
-
-            return this.get(board);
+        if (direction != null) {
+            return direction.toString();
         }
 
-        return direction.toString();
+        return Direction.UP.toString();
     }
 
     public static void main(String[] args) {
