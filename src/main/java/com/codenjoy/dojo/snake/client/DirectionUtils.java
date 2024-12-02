@@ -8,11 +8,11 @@ import java.util.*;
 
 public class DirectionUtils {
     public static Direction getDirection(Point from, Point to) {
-        if (to.getY() == from.getY() && to.getX() > from.getX()) {
+        if (to.getX() > from.getX()) {
             return Direction.RIGHT;
-        } else if (to.getY() == from.getY() && to.getX() < from.getX()) {
+        } else if (to.getX() < from.getX()) {
             return Direction.LEFT;
-        } else if (to.getX() == from.getX() && to.getY() > from.getY()) {
+        } else if (to.getY() > from.getY()) {
             return Direction.UP;
         } else {
             return Direction.DOWN;
