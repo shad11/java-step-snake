@@ -136,8 +136,15 @@ public class Board extends AbstractBoard<Elements> {
         Point head = getHead();
         List<Point> snake = getSnake();
         int sizeMax = (int) Math.pow(this.size() - 2, 2) / 4;
-        Elements goalStone = snake.size() < sizeMax ? Elements.GOOD_APPLE : Elements.BAD_APPLE;
-        Elements badStone = snake.size() < sizeMax ? Elements.BAD_APPLE : Elements.GOOD_APPLE;
+        boolean isAppleInCorner = countNear(getApples().get(0), Elements.BREAK) == 2;
+
+        Elements goalStone =
+                (snake.size() >= sizeMax || (snake.size() >= (this.size() - 2) * 2 && isAppleInCorner))
+                        ? Elements.BAD_APPLE
+                        : Elements.GOOD_APPLE ;
+        Elements badStone = snake.size() >= sizeMax
+                ? Elements.BAD_APPLE
+                : Elements.GOOD_APPLE;
         Point goal = get(goalStone).get(0);
 
         this.path = new HashMap<>();

@@ -101,7 +101,7 @@ public class DirectionUtils {
                 return direction;
             }
 
-            if (visited.contains(next)) {
+            if (visited.contains(next) || !isSaveNextPoint(next, visited)) {
                 continue;
             }
 
@@ -119,6 +119,10 @@ public class DirectionUtils {
                     nextPoints.put(direction, next);
                 }
             }
+        }
+
+        if (nextPoints.size() == 1) {
+            return nextPoints.keySet().iterator().next();
         }
 
         if (nextPoints.size() > 1) {
@@ -139,6 +143,20 @@ public class DirectionUtils {
 //        System.out.println("Visited points: " + visited);
 
         return nextPoints.isEmpty() ? null : nextPoints.keySet().iterator().next();
+    }
+
+    private static boolean isSaveNextPoint(Point point, Set<Point> visited) {
+        List<Direction> directions = new ArrayList<>(Direction.getValues());
+
+        for (Direction direction : directions) {
+            Point next = direction.change(point);
+
+            if (!visited.contains(next)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static int manhattanDistance(Point a, Point b) {
