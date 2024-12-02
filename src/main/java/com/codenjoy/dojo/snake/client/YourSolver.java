@@ -57,6 +57,13 @@ public class YourSolver implements Solver<Board> {
 
         Direction direction = board.path.remove(board.getHead());
 
+        if (direction == null) {
+            board.path.clear();
+            board.move();
+
+            return this.get(board);
+        }
+
         return direction.toString();
     }
 

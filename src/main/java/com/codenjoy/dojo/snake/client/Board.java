@@ -28,6 +28,7 @@ import com.codenjoy.dojo.services.Direction;
 import com.codenjoy.dojo.services.Point;
 import com.codenjoy.dojo.snake.model.Elements;
 
+import javax.lang.model.element.Element;
 import java.util.*;
 
 public class Board extends AbstractBoard<Elements> {
@@ -132,31 +133,35 @@ public class Board extends AbstractBoard<Elements> {
     }
 
     public void move() {
-        Point apple = getApples().get(0);
         Point head = getHead();
+        List<Point> snake = getSnake();
+        int sizeMax = (int) Math.pow(this.size() - 2, 2) / 4;
+        Elements goalStone = snake.size() < sizeMax ? Elements.GOOD_APPLE : Elements.BAD_APPLE;
+        Elements badStone = snake.size() < sizeMax ? Elements.BAD_APPLE : Elements.GOOD_APPLE;
+        Point goal = get(goalStone).get(0);
 
         this.path = new HashMap<>();
 
-        if (apple == null) {
+        if (goal == null) {
             return;
         }
 
-        if (isNear(head, Elements.GOOD_APPLE)) {
-            Direction direction = DirectionUtils.getDirection(head, apple);
+        // TODO: 30 should be a constant
+        if (isNear(head, goalStone) || (snake.size() >= 30 && isNear(head, badStone))) {
+            Direction direction = DirectionUtils.getDirection(head, goal);
             Point next = direction.change(head);
 
-            if (!isAt(next, Elements.BREAK) && !isAt(next, Elements.BAD_APPLE) && !getSnake().contains(next)) {
+            if (!isAt(next, Elements.BREAK) && !isAt(next, badStone) && !getSnake().contains(next)) {
                 this.path.put(head, direction);
 
                 return;
             }
         }
 
-        Set<Point> visited = new HashSet<>(getSnake());
-        visited.addAll(getBarriers());
+        Set<Point> visited = new HashSet<>(snake);
+        visited.addAll(getWalls());
+        visited.addAll(get(badStone));
 
-        this.path = DirectionUtils.findPath(this, head, apple, visited);
-
-        System.out.println("Path:" + this.path);
+        this.path = DirectionUtils.findPath(this, head, goal, visited);
     }
 }
