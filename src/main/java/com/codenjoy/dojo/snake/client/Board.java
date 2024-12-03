@@ -28,12 +28,9 @@ import com.codenjoy.dojo.services.Direction;
 import com.codenjoy.dojo.services.Point;
 import com.codenjoy.dojo.snake.model.Elements;
 
-import javax.lang.model.element.Element;
 import java.util.*;
 
 public class Board extends AbstractBoard<Elements> {
-    public Map<Point, Direction> path = new HashMap<>();
-
     @Override
     public Elements valueOf(char ch) {
         return Elements.valueOf(ch);
@@ -132,107 +129,49 @@ public class Board extends AbstractBoard<Elements> {
         return get(Elements.BREAK);
     }
 
-    public Direction getNextMove() {
+    public Direction getNextDirection() {
         Point head = getHead();
         List<Point> snake = getSnake();
+        int sizeMax = (int) Math.pow(this.size() - 2, 2) / 4;
 
-        int sizeMax = 42;// (int) Math.pow(this.size() - 2, 2) / 4;
-
-        Elements goalStone =
-                snake.size() >= sizeMax
-                        ? Elements.BAD_APPLE
-                        : Elements.GOOD_APPLE;
+        Elements goalStone = snake.size() >= sizeMax
+                ? Elements.BAD_APPLE
+                : Elements.GOOD_APPLE;
         Elements badStone = snake.size() >= sizeMax
                 ? Elements.GOOD_APPLE
                 : Elements.BAD_APPLE;
         Point goal = snake.size() >= sizeMax ? getStones().get(0) : getApples().get(0);
-
-        this.path = new HashMap<>();
 
         if (goal == null) {
             return null;
         }
 
+        Set<Point> barriers = new HashSet<>(snake);
+        barriers.addAll(getWalls());
+        barriers.addAll(get(badStone));
+
         // TODO: 30 should be a constant
         if (isNear(head, goalStone) || (snake.size() >= 30 && isNear(head, badStone))) {
             Direction direction = DirectionUtils.getDirection(head, goal);
             Point next = direction.change(head);
 
-            if (!isAt(next, Elements.BREAK) && !isAt(next, badStone) && !getSnake().contains(next)) {
-                this.path.put(head, direction);
-
+            if (!barriers.contains(next)) {
                 return direction;
             }
         }
 
-        Set<Point> visited = new HashSet<>(snake);
-        visited.addAll(getWalls());
-        visited.addAll(get(badStone));
+        Direction[] path = DirectionUtils.findPath(head, goal, barriers);
 
-        Map<Point, Direction> newPath = DirectionUtils.findPath(head, goal, visited);
-
-        if (newPath != null) {
-            return newPath.get(head);
-        } else {
-            Direction direction = DirectionUtils.findSaveDirection(this, head, visited);
-
-            if (direction != null && isNear(head, badStone)) {
-                direction = DirectionUtils.getDirection(head, get(badStone).get(0));
-            }
-
-            return direction;
-        }
-    }
-
-    public void move() {
-        Point head = getHead();
-        List<Point> snake = getSnake();
-
-        int sizeMax = 42;// (int) Math.pow(this.size() - 2, 2) / 4;
-
-        Elements goalStone =
-                snake.size() >= sizeMax
-                        ? Elements.BAD_APPLE
-                        : Elements.GOOD_APPLE;
-        Elements badStone = snake.size() >= sizeMax
-                ? Elements.GOOD_APPLE
-                : Elements.BAD_APPLE;
-        Point goal = snake.size() >= sizeMax ? getStones().get(0) : getApples().get(0);
-
-        this.path = new HashMap<>();
-
-        if (goal == null) {
-            return;
+        if (path != null) {
+            return path[0];
         }
 
-        // TODO: 30 should be a constant
-        if (isNear(head, goalStone) || (snake.size() >= 30 && isNear(head, badStone))) {
-            Direction direction = DirectionUtils.getDirection(head, goal);
-            Point next = direction.change(head);
+        Direction direction = DirectionUtils.findSaveDirection(this, head, barriers);
 
-            if (!isAt(next, Elements.BREAK) && !isAt(next, badStone) && !getSnake().contains(next)) {
-                this.path.put(head, direction);
-
-                return;
-            }
+        if (direction != null && isNear(head, badStone)) {
+            direction = DirectionUtils.getDirection(head, get(badStone).get(0));
         }
 
-        Set<Point> visited = new HashSet<>(snake);
-        visited.addAll(getWalls());
-        visited.addAll(get(badStone));
-
-        Map<Point, Direction> newPath = DirectionUtils.findPath(head, goal, visited);
-
-        if (newPath != null) {
-            this.path = newPath;
-        } else {
-            Direction direction = DirectionUtils.findSaveDirection(this, head, visited);
-
-            if (direction != null) {
-                this.path.put(head, direction);
-            } else {
-                this.path.put(head, Direction.UP);
-            }
-        }
+        return direction;
     }
 }
