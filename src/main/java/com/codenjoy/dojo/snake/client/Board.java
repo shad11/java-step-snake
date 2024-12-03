@@ -129,7 +129,7 @@ public class Board extends AbstractBoard<Elements> {
         return get(Elements.BREAK);
     }
 
-    public Direction getNextDirection() {
+    public String getNextDirection() {
         Point head = getHead();
         List<Point> snake = getSnake();
         int sizeMax = (int) Math.pow(this.size() - 2, 2) / 4;
@@ -156,11 +156,11 @@ public class Board extends AbstractBoard<Elements> {
             Point next = direction.change(head);
 
             if (!barriers.contains(next)) {
-                return direction;
+                return direction.toString();
             }
         }
 
-        Direction[] path = DirectionUtils.findPath(head, goal, barriers);
+        String[] path = DirectionUtils.findPath(head, goal, barriers);
 
         if (path != null) {
             return path[0];
@@ -168,10 +168,10 @@ public class Board extends AbstractBoard<Elements> {
 
         Direction direction = DirectionUtils.findSaveDirection(this, head, barriers);
 
-        if (direction != null && isNear(head, badStone)) {
-            direction = DirectionUtils.getDirection(head, get(badStone).get(0));
-        }
+//        if (direction == null && isNear(head, badStone)) {
+//            direction = DirectionUtils.getDirection(head, get(badStone).get(0));
+//        }
 
-        return direction;
+        return direction != null ? direction.toString() : null;
     }
 }

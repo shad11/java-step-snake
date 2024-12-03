@@ -52,10 +52,10 @@ public class YourSolver implements Solver<Board> {
             return this.get(board);
         }
 
-        Direction direction = board.getNextDirection();
+        String direction = board.getNextDirection();
 
         if (direction != null) {
-            return direction.toString();
+            return direction;
         }
 
         return Direction.UP.toString();

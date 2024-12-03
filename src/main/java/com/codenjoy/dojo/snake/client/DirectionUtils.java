@@ -19,30 +19,31 @@ public class DirectionUtils {
         }
     }
 
-    public static Direction[] findPath(Point start, Point goal, Set<Point> barriers) {
-        Queue<LinkedHashMap<Point, Direction>> queue = new LinkedList<>();
+    public static String[] findPath(Point start, Point goal, Set<Point> barriers) {
+        Queue<LinkedHashMap<Point, String>> queue = new LinkedList<>();
         Set<Point> visited = new HashSet<>();
 
         visited.add(start);
         queue.add(new LinkedHashMap<>(Collections.singletonMap(start, null)));
 
         while (!queue.isEmpty()) {
-            Map<Point, Direction> path = queue.poll();
+            Map<Point, String> path = queue.poll();
             Point current = path.keySet().toArray(new Point[0])[path.size() - 1];
 
             if (current.equals(goal)) {
-                return Arrays.copyOfRange(path.values().toArray(new Direction[0]), 1, path.size());
+                return Arrays.copyOfRange(path.values().toArray(new String[0]), 1, path.size());
             }
 
             for (Direction direction : Direction.getValues()) {
                 Point next = direction.change(current);
 
+                // TODO: add check for nearest free direction
                 if (barriers.contains(next) || visited.contains(next)) {
                     continue;
                 }
 
-                LinkedHashMap<Point, Direction> newPath = new LinkedHashMap<>(path);
-                newPath.put(next, direction);
+                LinkedHashMap<Point, String> newPath = new LinkedHashMap<>(path);
+                newPath.put(next, direction.toString());
 
                 queue.add(newPath);
                 visited.add(next);
