@@ -171,8 +171,6 @@ public class Board extends AbstractBoard<Elements> {
 //        List<Point> path = DirectionUtils.findPath(head, goal, barriers);
 
         if (path != null) {
-            System.out.println("Path: " + path);
-
             return DirectionUtils.getDirection(head, path.get(1)).toString();
         }
 
